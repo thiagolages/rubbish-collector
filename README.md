@@ -1,4 +1,14 @@
-# RubbishCollector
+# rubbish-collector
+
+University of Technology Sydney, Australia.
+Assignment for 41013 Robotics subject, Autumn 2019 session
+
+Group Members:
+ - Catherine Azzi (@CAZZI1)
+ - Jarrod Hilaire (@jarrodhilaire)
+ - Thiago Lages   (@thiagolages)
+ 
+Subject coordinator: Dr. Gavin Paul (@gapaul)
 
 ## 1) Project Description: ##
 Initial idea is based around a turtle-bot following a straight line (which will act as a kerb, for example) while the attached Dobot with an end effector gripper picks-ups/sorts blocks (which acts as garbage) to envision a garbage collection operation. Computer vision will be used to move the Turtlebot and possibly pick up the blocks as well.
