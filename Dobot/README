@@ -1,0 +1,14 @@
+README
+
+Dobot.m
+
+    A MATLAB class file for the Dobot robot.
+    
+Main.m
+
+    A simple MATLAB file for constructing and plotting the Dobot robot.
+    
+Dobot Ply Files
+
+    A series of realistic 3D object ply files for simulation of the Dobot robot.
+    Link5 includes the 3D object ply file for claw gripper end-effector.
