@@ -5,15 +5,23 @@ from geometry_msgs.msg import Twist
 from ar_track_alvar_msgs.msg import AlvarMarkers
 
 def follow_tag():
+
+	global twist_msg
         rospy.init_node('robotics_follow_tag', anonymous=True)
-	#rate = rospy.Rate(20) # 20hz
+	
+	#_cmd_vel_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=20)
+
 
 	# ar_pose_marker - topic
 	# ar_track_alvar/AlvarMarkers -type
 	# markers - field
 
 	rospy.Subscriber("ar_pose_marker", AlvarMarkers, ar_tag_callback)
+	#_cmd_vel_pub.publish(twist_msg)
+
+
 	rospy.spin()
+	#rate.sleep()
 
 
 
@@ -22,29 +30,54 @@ def ar_tag_callback(data):
     #rospy.loginfo("Recognized an AR Tag !")
 	#rospy.loginfo("ar_pose_marker is publishing and being received inside follow_tag node !")
 	global twist_msg
-	_cmd_vel_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=20)
+
+	_cmd_vel_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
 	#rospy.loginfo(data)
-	if len(data.markers) != 0:
-		rospy.loginfo(len(data.markers))
-		message = "Detected an AR Tag ! Moving.."
+	while len(data.markers) != 0:
 		
-		twist_msg.linear.x = 0.15
 		dist = data.markers[0].pose.pose.position.x
-
-		rospy.loginfo(dist)
-
 		if dist >= 0.30:
 		#rospy.loginfo(message)
 			message = "I'm "+str(dist)+"m away from goal. Driving.."
+			twist_msg.linear.x = 0.15
+			twist_msg.linear.y = 0.0
+			twist_msg.linear.z = 0.0
+			twist_msg.angular.x = 0.0
+			twist_msg.angular.y = 0.0
+			twist_msg.angular.z = 0.0
 			_cmd_vel_pub.publish(twist_msg)
-
 		else:
 			message = "Reached destination, stopped."
-	else:
+			twist_msg.linear.x = 0.0
+			twist_msg.linear.y = 0.0
+			twist_msg.linear.z = 0.0
+			twist_msg.angular.x = 0.0
+			twist_msg.angular.y = 0.0
+			twist_msg.angular.z = 0.0
+			dist = 0.0
+			_cmd_vel_pub.publish(twist_msg)
+
+		rospy.loginfo("#markers = %s",str(len(data.markers)))
+		rospy.loginfo("dist = %s meters",str(dist))
+		rospy.loginfo(message)
+		break # we HAVE TO break it here, otherwise the while loop will keep going forever
+			  # since we're checking if THE SAME message has len() != 0
+
+
+	if len(data.markers) == 0:
+
 		message = "Nothing detected. Standing still.."
 		twist_msg.linear.x = 0.0
+		twist_msg.linear.y = 0.0
+		twist_msg.linear.z = 0.0
+		twist_msg.angular.x = 0.0
+		twist_msg.angular.y = 0.0
+		twist_msg.angular.z = 0.0
 		dist = 0.0
-
+		_cmd_vel_pub.publish(twist_msg)
+	
+	rospy.loginfo("#markers = %s",str(len(data.markers)))
+	rospy.loginfo("dist = %s meters",str(dist))
 	rospy.loginfo(message)
 
 
