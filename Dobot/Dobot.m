@@ -3,6 +3,8 @@ classdef Dobot < handle
 
     properties
         model;
+%         logger = SingleInstance.Logger;
+        movement = MoveDobot();
         
         % Sets the dimensions of the workspace
         workspace = [-0.5 0.5 -0.5 0.5 0 0.5];
@@ -31,13 +33,19 @@ classdef Dobot < handle
         %% Create Dobot Robot
         
         function DobotRobot(self, name, base_location)
- 
-        L(1) = Link('d',0.103, 'a',0,      'alpha',-pi/2, 'offset',0,     'qlim',deg2rad([-135,135]));
-        L(2) = Link('d',0,     'a',0.136,  'alpha',0,     'offset',-pi/2, 'qlim',deg2rad([-5, 85]));
-        L(3) = Link('d',0,     'a',0.1685, 'alpha',0,     'offset',0,     'qlim',deg2rad([-10,95]));
-        L(4) = Link('d',0,     'a',0.0525, 'alpha',-pi/2, 'offset',0,     'qlim',deg2rad([-90,90]));
-        L(5) = Link('d',0,     'a',0,      'alpha',0,     'offset',0,     'qlim',deg2rad([-180,180]));
+            
+            L(1) = Link('d',0.103,'a',0,'alpha',-pi/2,'offset',0,'qlim', deg2rad([-135,135]));
+            L(2) = Link('d',0,'a',0.136,'alpha',0,'offset',-pi/2,'qlim', deg2rad([-5, 85]));
+            L(3) = Link('d',0,'a',0.1685,'alpha',0,'offset',0,'qlim', deg2rad([-10,95]));
+            L(4) = Link('d',0,'a',0.0525,'alpha',-pi/2,'offset',-pi/2,'qlim', deg2rad([-90,90]));
+            L(5) = Link('d',0,'a',0,'alpha',0,'offset',0,'qlim', deg2rad([-180,180]));
 
+
+        % a = translation about x
+        % d = translation about z
+        % alpha = rotation about x
+        % theta = offset = roatation about z
+        
         % Builds the Dobot links, name and points to the base position translation.   
         self.model = SerialLink(L, 'name', name);
         self.model.base = se3(se2(base_location));
@@ -48,7 +56,7 @@ classdef Dobot < handle
 
         end
         
-        %% Plot and Colour Dobot Robot
+        %% Plot and Colour Dobot
 
         function PlotAndColourRobot(self)
             
@@ -60,7 +68,7 @@ classdef Dobot < handle
                 pause(0.01);
             end          
             
-            % Displays the dobot robot
+            % Display robot
             self.model.plot3d(zeros(1,self.model.n),'wrist', 'arrow','workspace' ...
                 ,self.workspace, 'delay', 0);
             axis([self.workspace(1) self.workspace(2) self.workspace(3) self.workspace(4) ...
@@ -70,12 +78,12 @@ classdef Dobot < handle
             end
             self.model.delay = 0;
             
-            % Try to correctly colour the dobot arm (if colours are in ply file data)
+            % Try to correctly colour the arm (if colours are in ply file data)
             for linkIndex = 0:self.model.n
                 handles = findobj('Tag', self.model.name);
                 h = get(handles,'UserData');
                 try
-                    h.link(linkIndex+1).Children.FaceVertexCData = [self.data{linkIndex+1}.vertex.red ...
+                    h.link(linkIndex+1).Children.FaceVertexCData = [data{linkIndex+1}.vertex.red ...
                         , data{linkIndex+1}.vertex.green ...
                         , data{linkIndex+1}.vertex.blue]/255;
                     h.link(linkIndex+1).Children.FaceColor = 'interp';
