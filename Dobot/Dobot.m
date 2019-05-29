@@ -54,7 +54,7 @@ classdef Dobot < handle
             
             for linkIndex = 0:self.model.n
                 [ faceData, vertexData, plyData{linkIndex+1} ] = ...
-                plyread(['Link',num2str(linkIndex),'.ply'],'tri');
+                plyread(['Dobot Ply Files/Link',num2str(linkIndex),'.ply'],'tri');
                 self.model.faces{linkIndex+1} = faceData;
                 self.model.points{linkIndex+1} = vertexData;
                 pause(0.01);
