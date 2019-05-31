@@ -4,24 +4,6 @@ import rospy
 from geometry_msgs.msg import Twist
 from ar_track_alvar_msgs.msg import AlvarMarkers
 
-def follow_tag():
-
-	global twist_msg
-        rospy.init_node('robotics_follow_tag', anonymous=True)
-	
-	#_cmd_vel_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=20)
-
-
-	# ar_pose_marker - topic
-	# ar_track_alvar/AlvarMarkers -type
-	# markers - field
-
-	rospy.Subscriber("ar_pose_marker", AlvarMarkers, ar_tag_callback)
-	#_cmd_vel_pub.publish(twist_msg)
-
-
-	rospy.spin()
-	#rate.sleep()
 
 
 
@@ -29,9 +11,8 @@ def ar_tag_callback(data):
 
     #rospy.loginfo("Recognized an AR Tag !")
 	#rospy.loginfo("ar_pose_marker is publishing and being received inside follow_tag node !")
-	global twist_msg
+	global twist_msg, cmd_vel_pub
 
-	_cmd_vel_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
 	#rospy.loginfo(data)
 	while len(data.markers) != 0:
 		
@@ -80,20 +61,62 @@ def ar_tag_callback(data):
 	rospy.loginfo("dist = %s meters",str(dist))
 	rospy.loginfo(message)
 
+def follow_tag():
+
+	global twist_msg
+
+	
+	#_cmd_vel_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=20)
+
+	# ar_pose_marker - topic
+	# ar_track_alvar/AlvarMarkers -type
+	# markers - field
+
+	rospy.Subscriber("ar_pose_marker", AlvarMarkers, ar_tag_callback)
+	#_cmd_vel_pub.publish(twist_msg)
+
+
+	rospy.spin()
+	#rate.sleep()
 
 if __name__ == '__main__':
-    try:
 
-	twist_msg = Twist()
-	twist_msg.linear.x = 0.0
-	twist_msg.linear.y = 0.0
-	twist_msg.linear.z = 0.0
-	twist_msg.angular.x = 0.0
-	twist_msg.angular.y = 0.0
-	twist_msg.angular.z = 0.0
-        follow_tag()
-    except rospy.ROSInterruptException:
-        pass
+	rospy.init_node('follow_tag')
+	
+	try:
+
+		twist_msg = Twist()
+		twist_msg.linear.x = 0.26
+		twist_msg.linear.y = 0.0
+		twist_msg.linear.z = 0.0
+		twist_msg.angular.x = 0.0
+		twist_msg.angular.y = 0.0
+		twist_msg.angular.z = 0.0
+		#follow_tag()
+		r = rospy.Rate(10)
+		cmd_vel_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=1)
+		while not rospy.is_shutdown():
+			print("testtttt")
+			cmd_vel_pub.publish(twist_msg)
+			r.sleep()
+    
+		# once we're done, stop it
+		twist_msg.linear.x = 0.0
+		twist_msg.linear.y = 0.0
+		twist_msg.linear.z = 0.0
+		twist_msg.angular.x = 0.0
+		twist_msg.angular.y = 0.0
+		twist_msg.angular.z = 0.0
+        	cmd_vel_pub.publish(twist_msg)
+
+	except rospy.ROSInterruptException:
+        	twist_msg.linear.x = 0.0
+		twist_msg.linear.y = 0.0
+		twist_msg.linear.z = 0.0
+		twist_msg.angular.x = 0.0
+		twist_msg.angular.y = 0.0
+		twist_msg.angular.z = 0.0
+        	cmd_vel_pub.publish(twist_msg)
 
 
 
