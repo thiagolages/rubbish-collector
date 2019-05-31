@@ -5,6 +5,7 @@ from geometry_msgs.msg import Twist
 from ar_track_alvar_msgs.msg import AlvarMarkers
 from std_msgs.msg import Bool
 
+twist_msg = Twist()
 
 
 def ar_tag_callback(data):
@@ -13,20 +14,18 @@ def ar_tag_callback(data):
 	#rospy.loginfo("ar_pose_marker is publishing and being received inside follow_tag node !")
 	global twist_msg, cmd_vel_pub
 
-		status_done = False
-	status_done_pub = rospy.ospy.Publisher('/cmd_vel', Bool, queue_size=1)
+	#status_done = False
+	#status_done = rospy.get_param('/robotics/dobot_is_done')
+	
+	status_done = True # just testing
 
-
-		
-
-	#rospy.loginfo(data)
-	while len(data.markers) != 0:
+	if status_done == True and len(data.markers) != 0:
 		
 		dist = data.markers[0].pose.pose.position.x
-		if dist >= 0.30:
+		if dist >= 0.30: # not in reach yet
 		#rospy.loginfo(message)
-			message = "I'm "+str(dist)+"m away from goal. Driving.."
-			twist_msg.linear.x = 0.15
+			rospy.loginfo("I'm "+str(dist)+"m away from goal. Driving..")
+			twist_msg.linear.x = 0.10
 			twist_msg.linear.y = 0.0
 			twist_msg.linear.z = 0.0
 			twist_msg.angular.x = 0.0
@@ -35,98 +34,65 @@ def ar_tag_callback(data):
 			cmd_vel_pub.publish(twist_msg)
 
 			status_done = False
-			status_done_pub.publish(status)
+			rospy.set_param('/robotics/turtlebot_is_done', status_done)
 
-		else:
-			message = "Reached destination, stopped."
-			twist_msg.linear.x = 0.0
-			twist_msg.linear.y = 0.0
-			twist_msg.linear.z = 0.0
-			twist_msg.angular.x = 0.0
-			twist_msg.angular.y = 0.0
-			twist_msg.angular.z = 0.0
-			dist = 0.0
-			cmd_vel_pub.publish(twist_msg)
+		else: # too close
+			rospy.loginfo("Reached destination, stopping..")
+			stop_motors()
 
 			status_done = True
-			status_done_pub.publish(status)
+			rospy.set_param('/robotics/turtlebot_is_done', status_done)
 
 
 		rospy.loginfo("#markers = %s",str(len(data.markers)))
 		rospy.loginfo("dist = %s meters",str(dist))
-		rospy.loginfo(message)
-		break # we HAVE TO break it here, otherwise the while loop will keep going forever
-				# since we're checking if THE SAME message has len() != 0
+		
+		
+	else: # dobot is not done
+		if status_done == False:
+			rospy.loginfo("Dobot is not done yet.")
+		if len(data.markers) != 0:
+			rospy.loginfo("No markers detected.")
 
-
-	if len(data.markers) == 0:
-
-		message = "Nothing detected. Standing still.."
-		twist_msg.linear.x = 0.0
-		twist_msg.linear.y = 0.0
-		twist_msg.linear.z = 0.0
-		twist_msg.angular.x = 0.0
-		twist_msg.angular.y = 0.0
-		twist_msg.angular.z = 0.0
-		dist = 0.0
-		cmd_vel_pub.publish(twist_msg)
-	
-	rospy.loginfo("#markers = %s",str(len(data.markers)))
-	rospy.loginfo("dist = %s meters",str(dist))
-	rospy.loginfo(message)
+		stop_motors()
 
 def follow_tag():
-
-	global twist_msg
-
-	
-	#_cmd_vel_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=20)
 
 	# ar_pose_marker - topic
 	# ar_track_alvar/AlvarMarkers -type
 	# markers - field
 
 	rospy.Subscriber("ar_pose_marker", AlvarMarkers, ar_tag_callback)
-	#_cmd_vel_pub.publish(twist_msg)
-
 
 	rospy.spin()
-	#rate.sleep()
+
+def stop_motors():
+
+	global cmd_vel_pub, twist_msg
+
+	twist_msg.linear.x = 0.0
+	twist_msg.linear.y = 0.0
+	twist_msg.linear.z = 0.0
+	twist_msg.angular.x = 0.0
+	twist_msg.angular.y = 0.0
+	twist_msg.angular.z = 0.0
+	cmd_vel_pub.publish(twist_msg)
+
 
 if __name__ == '__main__':
 
 	rospy.init_node('follow_tag')
 	
+	rospy.on_shutdown(stop_motors)
+	r = rospy.Rate(10)
+	cmd_vel_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=1)
+	
 	try:
-
-		twist_msg = Twist()
-		twist_msg.linear.x = 0.26
-		#follow_tag()
-		r = rospy.Rate(10)
-		cmd_vel_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=1)
-		while not rospy.is_shutdown():
-			print("testtttt")
-			cmd_vel_pub.publish(twist_msg)
-			r.sleep()
-		
-		# once we're done, stop it
-		twist_msg.linear.x = 0.0
-		twist_msg.linear.y = 0.0
-		twist_msg.linear.z = 0.0
-		twist_msg.angular.x = 0.0
-		twist_msg.angular.y = 0.0
-		twist_msg.angular.z = 0.0
-					cmd_vel_pub.publish(twist_msg)
+		stop_motors() # make sure it begins stopped
+		follow_tag()
 
 	except rospy.ROSInterruptException:
-					twist_msg.linear.x = 0.0
-		twist_msg.linear.y = 0.0
-		twist_msg.linear.z = 0.0
-		twist_msg.angular.x = 0.0
-		twist_msg.angular.y = 0.0
-		twist_msg.angular.z = 0.0
-					cmd_vel_pub.publish(twist_msg)
-
+		stop_motors()
 
 
 '''
@@ -158,30 +124,4 @@ ar_track_alvar_msgs/AlvarMarker[] markers
 				float64 y
 				float64 z
 				float64 w
-'''
-
-'''
-
-import rospy
-from std_msgs.msg import String
-
-def callback(data):
-		rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.data)
-		
-def listener():
-
-		# In ROS, nodes are uniquely named. If two nodes with the same
-		# name are launched, the previous one is kicked off. The
-		# anonymous=True flag means that rospy will choose a unique
-		# name for our 'listener' node so that multiple listeners can
-		# run simultaneously.
-		rospy.init_node('listener', anonymous=True)
-
-		rospy.Subscriber("chatter", String, callback)
-
-		# spin() simply keeps python from exiting until this node is stopped
-		rospy.spin()
-
-if __name__ == '__main__':
-		listener()
 '''
