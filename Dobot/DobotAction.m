@@ -1,18 +1,35 @@
-%% Assignment 2
+%% Dobot Control Code
 
 close all;
 clear;
 clc;
 
-%% Script Begin
-
-% Turn the dobot on and connect it to the computer
+% Turn the dobot on and connect it to the computer via usb cable 
 % Open a terminal and call roslaunch dobot_magician_driver dobot_magician.launch
     % The dobot will calibrate and move to a "home" location
+    
+%% Communication of Dobot with turtlebot Begin
 
-% In the command window of Matlab, call rosinit('http://localhost:11311')
+% In the command window of Matlab:
+
+    %call rosinit('http://localhost:11311')
     % If an error message returns, then call rosshutdown
     % Then call rosinit('http://localhost:11311')
+
+% Create a parameter tree object to interact with the parameter server
+
+    ptree = rosparam
+    has(ptree,'ROBOT_IP')
+    ans = logical
+    
+    
+    set(ptree,'ROBOT_IP','192.168.1.1');
+set(ptree, '/myrobot/ROBOT_IP','192.168.1.100');
+
+
+
+%% Dobot Action Begin
+
 
 % Sets up the cartesian position of the end-effector
 cartmsg_ = rosmessage(cartsvc_);
@@ -52,3 +69,11 @@ cartsvc_.call(cartmsg_)
 suctioncupmsg_.IsEndEffectorEnabled = 0;
 suctioncupmsg_.EndEffectorState = 0;
 suctioncupsvc_.call(suctioncupmsg_);
+
+
+%% Communication of Dobot with turtlebot End
+
+
+
+
+

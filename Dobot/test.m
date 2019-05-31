@@ -14,19 +14,21 @@ clc;
     % If an error message returns, then call rosshutdown
     % Then call rosinit('http://localhost:11311')
 
+%rosinit('http://localhost:11311')
 % Sets up the cartesian position of the end-effector
+cartsvc_ = rossvcclient('/dobot_magician/PTP/set_cartesian_pos');
 cartmsg_ = rosmessage(cartsvc_);
 
 % Set home position
-cartmsg_.TargetPoints = [0.2, 0, 0, 0];
+cartmsg_.TargetPoints=[0.2,0.1,-0.05,0];
 cartsvc_.call(cartmsg_)
 
 % Move to object
- cartmsg_.TargetPoints = [0.25, 0, -0.13, 0];
-cartsvc_.call(cartmsg_)
+%cartmsg_.TargetPoints = [0.5, 0.0, 0.0, 0.0];
+%cartsvc_.call(cartmsg_)
 
-cartmsg_.TargetPoints = [0.25, 0, 1.13, 0];
-cartsvc_.call(cartmsg_)
+%cartmsg_.TargetPoints = [0.25, 0, 1.13, 0];
+%cartsvc_.call(cartmsg_)
 
 % Pick up object
 suctioncupsvc_ = rossvcclient('/dobot_magician/end_effector/set_suction_cup');
@@ -37,18 +39,19 @@ suctioncupmsg_.EndEffectorState = 1;
 suctioncupsvc_.call(suctioncupmsg_);
 
 % Move back to home position with the object
-cartmsg_.TargetPoints = [0.2, 0, 0, 0];
-cartsvc_.call(cartmsg_)
+%cartmsg_.TargetPoints = [0.0, 0, 0, 0];
+%cartsvc_.call(cartmsg_)
 
 % Move to intermediate position with object
-cartmsg_.TargetPoints = [0.2, 0.2, 0, 0];
-cartsvc_.call(cartmsg_)
+%cartmsg_.TargetPoints = [0.2, 0.2, 0, 0];
+%cartsvc_.call(cartmsg_)
 
 % Move to drop position with object
-cartmsg_.TargetPoints = [0, 0.2, 0, 0];
-cartsvc_.call(cartmsg_)
+%cartmsg_.TargetPoints = [0, 0.2, 0, 0];
+%cartsvc_.call(cartmsg_)
 
 % Drop object
 suctioncupmsg_.IsEndEffectorEnabled = 0;
 suctioncupmsg_.EndEffectorState = 0;
 suctioncupsvc_.call(suctioncupmsg_);
+
