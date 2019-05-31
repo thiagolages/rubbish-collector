@@ -6,7 +6,8 @@ from ar_track_alvar_msgs.msg import AlvarMarkers
 from std_msgs.msg import Bool
 
 twist_msg = Twist()
-
+stop_distance = 0.20
+measurement_error = 0.1
 
 def ar_tag_callback(data):
 
@@ -19,10 +20,10 @@ def ar_tag_callback(data):
 	
 	status_done = True # just testing
 
-	if status_done == True and len(data.markers) != 0:
+	if status_done == True and len(data.markers) == 1:
 		
 		dist = data.markers[0].pose.pose.position.x
-		if dist >= 0.30: # not in reach yet
+		if dist >= stop_distance + measurement_error: # not in reach yet
 		#rospy.loginfo(message)
 			rospy.loginfo("I'm "+str(dist)+"m away from goal. Driving..")
 			twist_msg.linear.x = 0.10
@@ -41,7 +42,7 @@ def ar_tag_callback(data):
 			stop_motors()
 
 			status_done = True
-			rospy.set_param('/robotics/turtlebot_is_done', status_done)
+			rospy	.set_param('/robotics/turtlebot_is_done', status_done)
 
 
 		rospy.loginfo("#markers = %s",str(len(data.markers)))
@@ -51,9 +52,12 @@ def ar_tag_callback(data):
 	else: # dobot is not done
 		if status_done == False:
 			rospy.loginfo("Dobot is not done yet.")
-		if len(data.markers) != 0:
+		if len(data.markers) == 0:
 			rospy.loginfo("No markers detected.")
+		if len(data.markers) > 1:
+			rospy.loginfo("More than one marker detected.")
 
+		rospy.loginfo(" Stopping.")	
 		stop_motors()
 
 def follow_tag():

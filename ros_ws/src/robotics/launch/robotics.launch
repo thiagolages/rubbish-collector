@@ -1,10 +1,12 @@
 <launch>
-	<arg name="marker_size" default="9.0" />
+	<arg name="marker_size" default="8.0" />
 	<arg name="max_new_marker_error" default="0.05" />
 	<arg name="max_track_error" default="0.05" />
 	<arg name="cam_image_topic" default="/camera/color/image_raw" />
 	<arg name="cam_info_topic" default="/camera/color/camera_info" />
 	<arg name="output_frame" default="/base_link" />
+
+	<arg name="dobot" default="true">
 
 	<node name="ar_track_alvar" pkg="ar_track_alvar" type="individualMarkersNoKinect" respawn="true" output="screen">
 		<param name="marker_size"           type="double" value="$(arg marker_size)" />
@@ -16,9 +18,14 @@
 		<remap from="camera_info"   to="$(arg cam_info_topic)" />
 	</node>
 
+	<node name="follow_tag" pkg="robotics" type="follow_tag.py" respawn="false" output="screen"/>
 
 	<node name="dobot_static_tf_publisher" pkg="robotics" type="dobot_static_tf_publisher.py" respawn="true" output="screen"/>
-	<node name="follow_tag" pkg="robotics" type="follow_tag.py" respawn="false" output="screen"/>
+	
+	<group if="$(arg dobot)">
+ 		<include file="($find dobot_magician_driver)/launch/dobot_magician.launch"/>
+	</group>
+	
 
 
 </launch>
