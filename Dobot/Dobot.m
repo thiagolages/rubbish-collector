@@ -61,11 +61,12 @@ classdef Dobot < handle
         function PlotAndColourRobot(self)
             
             for linkIndex = 0:self.model.n
-                [ faceData, vertexData, data{linkIndex + 1} ] = plyread(['Link' ...
-                    ,num2str(linkIndex),'.ply'],'tri');
-                self.model.faces{linkIndex + 1} = faceData;
-                self.model.points{linkIndex + 1} = vertexData;
-            end
+                [ faceData, vertexData, plyData{linkIndex+1} ] = ...
+                plyread(['Dobot Ply Files/Link',num2str(linkIndex),'.ply'],'tri');
+                self.model.faces{linkIndex+1} = faceData;
+                self.model.points{linkIndex+1} = vertexData;
+                pause(0.01);
+            end          
             
             % Display robot
             self.model.plot3d(zeros(1,self.model.n),'wrist', 'arrow','workspace' ...
