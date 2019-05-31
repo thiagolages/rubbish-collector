@@ -17,6 +17,7 @@
 	</node>
 
 
+	<node name="dobot_static_tf_publisher" pkg="robotics" type="dobot_static_tf_publisher.py" respawn="true" output="screen"/>
 	<node name="follow_tag" pkg="robotics" type="follow_tag.py" respawn="false" output="screen"/>
 
 
