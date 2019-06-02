@@ -6,7 +6,7 @@
 	<arg name="cam_info_topic" default="/camera/color/camera_info" />
 	<arg name="output_frame" default="/base_link" />
 
-	<arg name="dobot" default="true">
+	<arg name="dobot" default="true"/>
 
 	<node name="ar_track_alvar" pkg="ar_track_alvar" type="individualMarkersNoKinect" respawn="true" output="screen">
 		<param name="marker_size"           type="double" value="$(arg marker_size)" />
@@ -18,14 +18,17 @@
 		<remap from="camera_info"   to="$(arg cam_info_topic)" />
 	</node>
 
-	<node name="follow_tag" pkg="robotics" type="follow_tag.py" respawn="false" output="screen"/>
+	<!-- <node name="follow_tag" pkg="robotics" type="follow_tag.py" respawn="false" output="screen"/> -->
 
 	<node name="dobot_static_tf_publisher" pkg="robotics" type="dobot_static_tf_publisher.py" respawn="true" output="screen"/>
 	
-	<group if="$(arg dobot)">
- 		<include file="($find dobot_magician_driver)/launch/dobot_magician.launch"/>
-	</group>
-	
-
+	<!-- <group if="$(arg dobot)">
+ 		<include file="/home/cazzi/rubbish-collector/ros_ws/src/dobot_magician_driver/launch/dobot_magician.launch"/>
+	</group> 
+ -->
+ 
+<!-- 	<include file="/home/cazzi/rubbish-collector/ros_ws/src/dobot_magician_driver/launch/dobot_magician.launch"/>
+ -->	
+	<include file="/home/cazzi/rubbish-collector/ros_ws/src/turtlebot3/turtlebot3_bringup/launch/turtlebot3_remote.launch"/>
 
 </launch>

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import rospy
+import rospy, os
 from geometry_msgs.msg import Twist
 from ar_track_alvar_msgs.msg import AlvarMarkers
 from std_msgs.msg import Bool
@@ -9,19 +9,22 @@ twist_msg = Twist()
 stop_distance = 0.20
 measurement_error = 0.1
 
+counter = 0
+
 def ar_tag_callback(data):
 
 		#rospy.loginfo("Recognized an AR Tag !")
 	#rospy.loginfo("ar_pose_marker is publishing and being received inside follow_tag node !")
-	global twist_msg, cmd_vel_pub
+	global twist_msg, cmd_vel_pub, counter
 
-	#status_done = False
-	#status_done = rospy.get_param('/robotics/dobot_is_done')
+	status_done = False # make it false at first for security
+	status_done = rospy.get_param('/robotics/dobot_is_done')
 	
-	status_done = True # just testing
+	#status_done = True
+	#rospy	.set_param('/robotics/turtlebot_is_done', status_done)
 
 	if status_done == True and len(data.markers) == 1:
-		
+		rospy.loginfo("UHEUASHEUAHS1Q1111111111")
 		dist = data.markers[0].pose.pose.position.x
 		if dist >= stop_distance + measurement_error: # not in reach yet
 		#rospy.loginfo(message)
@@ -41,21 +44,42 @@ def ar_tag_callback(data):
 			rospy.loginfo("Reached destination, stopping..")
 			stop_motors()
 
-			status_done = True
-			rospy	.set_param('/robotics/turtlebot_is_done', status_done)
+			counter = rospy.get_param('/robotics/counter')
+			print("counter before if = ",counter)
+
+			if (counter == 0):
+				print("COUNTER = 0")
+				status_done = True
+				rospy.set_param('/robotics/turtlebot_is_done', status_done)
+			#else:
+			#	status_done = False
+			#	rospy	.set_param('/robotics/turtlebot_is_done', status_done)
+			
+			counter = counter + 1			
+			print("counter after if and before set = ",counter)
+			rospy.set_param('/robotics/counter', counter)
+			counter = rospy.get_param('/robotics/counter')
+			print("counter after if and after set = ",counter)
 
 
 		rospy.loginfo("#markers = %s",str(len(data.markers)))
 		rospy.loginfo("dist = %s meters",str(dist))
 		
 		
-	else: # dobot is not done
+	else:
+		rospy.loginfo("UHEUASHEUAHS2222222222") 
 		if status_done == False:
 			rospy.loginfo("Dobot is not done yet.")
 		if len(data.markers) == 0:
 			rospy.loginfo("No markers detected.")
+			#status_done = True
+			#rospy	.set_param('/robotics/turtlebot_is_done', status_done)
 		if len(data.markers) > 1:
 			rospy.loginfo("More than one marker detected.")
+			#status_done = True
+			#rospy	.set_param('/robotics/turtlebot_is_done', status_done)
+
+ 		
 
 		rospy.loginfo(" Stopping.")	
 		stop_motors()
@@ -86,17 +110,22 @@ def stop_motors():
 if __name__ == '__main__':
 
 	rospy.init_node('follow_tag')
-	
+
 	rospy.on_shutdown(stop_motors)
 	r = rospy.Rate(10)
 	cmd_vel_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=1)
-	
+
+	rospy.set_param('/robotics/dobot_is_done', 0)
+	rospy.set_param('/robotics/counter', 0)
+
 	try:
 		stop_motors() # make sure it begins stopped
 		follow_tag()
 
+
 	except rospy.ROSInterruptException:
 		stop_motors()
+
 
 
 '''
