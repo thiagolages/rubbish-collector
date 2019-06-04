@@ -1,3 +1,6 @@
+### Update: Final Demo Video now available on YouTube:
+https://www.youtube.com/watch?v=h2JuSMFlm-c&feature=youtu.be
+
 # rubbish-collector
 
 University of Technology Sydney, Australia.
