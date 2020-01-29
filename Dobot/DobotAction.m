@@ -7,6 +7,7 @@ clc;
 % Turn the dobot on and connect it to the computer via usb cable 
 % Open a terminal and call roslaunch dobot_magician_driver dobot_magician.launch
     % The dobot will calibrate and move to a "home" location
+   
     
 %% Communication of Dobot with turtlebot Begin
 
@@ -17,20 +18,23 @@ clc;
     % Then call rosinit('http://localhost:11311')
 
 % Create a parameter tree object to interact with the parameter server
-
     ptree = rosparam
     has(ptree,'ROBOT_IP')
     ans = logical
     
+ % The ROBOT_IP parameters will be made available to all nodes connected to this ROS master
+    set(ptree,'ROBOT_IP','172.19.134.208');
+    set(ptree, '/myrobot/ROBOT_IP','172.19.134.208');
+    set(ptree, '/robotics/turlebot_is_done');
     
-    set(ptree,'ROBOT_IP','192.168.1.1');
-set(ptree, '/myrobot/ROBOT_IP','192.168.1.100');
-
-
-
+ % Run this to get the entire list of parameters stored on the parameter server
+    %plist = ptree.AvailableParameters
+    
+    if 'robotics/turlebot_is_done' = true;
+     
 %% Dobot Action Begin
 
-
+{
 % Sets up the cartesian position of the end-effector
 cartmsg_ = rosmessage(cartsvc_);
 
@@ -68,12 +72,13 @@ cartsvc_.call(cartmsg_)
 % Drop object
 suctioncupmsg_.IsEndEffectorEnabled = 0;
 suctioncupmsg_.EndEffectorState = 0;
-suctioncupsvc_.call(suctioncupmsg_);
-
+suctioncupsvc_.call(suctioncupmsg_);}
 
 %% Communication of Dobot with turtlebot End
 
 
-
-
-
+    else
+        pvalOut = rosparam("get",'robotics/turlebot_is_done')
+        }
+        
+set(ptree, '/robotics/dobot_is_done');

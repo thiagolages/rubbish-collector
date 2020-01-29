@@ -17,11 +17,19 @@ def ar_tag_callback(data):
 	#rospy.loginfo("ar_pose_marker is publishing and being received inside follow_tag node !")
 	global twist_msg, cmd_vel_pub, counter
 
+<<<<<<< Updated upstream
 	status_done = False # make it false at first for security
 	status_done = rospy.get_param('/robotics/dobot_is_done')
 	
 	#status_done = True
 	#rospy	.set_param('/robotics/turtlebot_is_done', status_done)
+=======
+		status_done = False
+	status_done_pub = rospy.getparam('/robotics/turtlebot_is_done')
+
+	r = rospy.Rate(10)
+		
+>>>>>>> Stashed changes
 
 	if status_done == True and len(data.markers) == 1:
 		rospy.loginfo("UHEUASHEUAHS1Q1111111111")
