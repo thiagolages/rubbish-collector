@@ -1,4 +1,7 @@
 ros_ws/src/turtlebot*
+ros_ws/src/ar_tools
+ros_ws/src/dobot_magician_driver
+Dobot/DobotAction (1).m
 
 devel/
 build/
