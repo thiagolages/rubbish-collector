@@ -1,8 +1,3 @@
-### Update: Final Demo Video now available on YouTube:
-**Video of successful completion of the task: [link](https://youtu.be/cC__Lanfi90)**
-
-![image](https://user-images.githubusercontent.com/22358397/150845039-f6032b7b-8a14-407a-a055-c8512db18747.png)
-
 # rubbish-collector
 
 University of Technology Sydney, Australia.
@@ -14,6 +9,11 @@ Group Members:
  - Thiago Lages   (@thiagolages)
  
 Subject coordinator: Dr. Gavin Paul (@gapaul)
+
+### Update: Final Demo Video now available on YouTube:
+**Video of successful completion of the task: [link](https://youtu.be/cC__Lanfi90)**
+
+![image](https://user-images.githubusercontent.com/22358397/150845039-f6032b7b-8a14-407a-a055-c8512db18747.png)
 
 ## 1) Project Description: ##
 Initial idea is based around a turtle-bot following a straight line (which will act as a kerb, for example) while the attached Dobot with an end effector gripper picks-ups/sorts blocks (which acts as garbage) to envision a garbage collection operation. Computer vision will be used to move the Turtlebot and possibly pick up the blocks as well.
