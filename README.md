@@ -1,5 +1,7 @@
 ### Update: Final Demo Video now available on YouTube:
-https://www.youtube.com/watch?v=h2JuSMFlm-c&feature=youtu.be
+**Video of successful completion of the task: [link](https://youtu.be/cC__Lanfi90)**
+
+![image](https://user-images.githubusercontent.com/22358397/150845039-f6032b7b-8a14-407a-a055-c8512db18747.png)
 
 # rubbish-collector
 
